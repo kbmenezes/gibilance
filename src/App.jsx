@@ -20,6 +20,7 @@ import {
   setDoc,
   onSnapshot,
   updateDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 export default function App() {
@@ -30,80 +31,121 @@ export default function App() {
 
   const [usuario, setUsuario] = useState(null);
 
+  // 👑 ADMIN
+  const adminEmail =
+    "latveriagibis@gmail.com";
+
   // 🦸 HQs
   const [hqs, setHqs] = useState([]);
 
   // 🔐 monitorar login
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (user) => {
-        setUsuario(user);
-      }
-    );
+    const unsubscribe =
+      onAuthStateChanged(
+        auth,
+        (user) => {
+          setUsuario(user);
+        }
+      );
 
     return () => unsubscribe();
   }, []);
 
-  // 🔥 carregar HQs em tempo real
+  // 🔥 carregar HQs
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "hqs"),
-      (snapshot) => {
-        const lista = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    const unsubscribe =
+      onSnapshot(
+        collection(db, "hqs"),
+        (snapshot) => {
+          const lista =
+            snapshot.docs.map(
+              (doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              })
+            );
 
-        setHqs(lista);
-      }
-    );
+          setHqs(lista);
+        }
+      );
 
     return () => unsubscribe();
   }, []);
 
-  // 🚀 criar HQs iniciais
+  // 🚀 criar HQs
   const criarHqs = async () => {
+    // 🔒 PROTEÇÃO ADMIN
+    if (
+      !usuario ||
+      !usuario.email ||
+      usuario.email
+        .trim()
+        .toLowerCase() !==
+        adminEmail.toLowerCase()
+    ) {
+      alert(
+        "Apenas o administrador pode criar HQs."
+      );
+
+      return;
+    }
+
     const dados = [
       {
         id: "1",
-        nome: "Homem-Aranha #1",
+        nome:
+          "Homem-Aranha #1",
         lance: 50,
         tempo: 60,
         historico: [],
         vencedor: "",
+        vencedorEmail: "",
       },
+
       {
         id: "2",
-        nome: "Batman: Ano Um",
+        nome:
+          "Batman: Ano Um",
         lance: 80,
         tempo: 60,
         historico: [],
         vencedor: "",
+        vencedorEmail: "",
       },
+
       {
         id: "3",
-        nome: "X-Men Clássico",
+        nome:
+          "X-Men Clássico",
         lance: 60,
         tempo: 60,
         historico: [],
         vencedor: "",
+        vencedorEmail: "",
       },
     ];
 
     for (const hq of dados) {
-      await setDoc(doc(db, "hqs", hq.id), hq);
+      await setDoc(
+        doc(db, "hqs", hq.id),
+        hq
+      );
     }
 
-    alert("HQs criadas!");
+    alert(
+      "HQs criadas com sucesso!"
+    );
   };
 
-  // 💰 dar lance
-  const darLance = async (hq) => {
+  // 💰 lance
+  const darLance = async (
+    hq
+  ) => {
     if (!usuario) {
       alert(
         "Faça login para participar."
       );
+
       return;
     }
 
@@ -111,93 +153,135 @@ export default function App() {
       return;
     }
 
-    const ref = doc(db, "hqs", hq.id);
+    const ref = doc(
+      db,
+      "hqs",
+      hq.id
+    );
 
     const historicoAtual =
       hq.historico || [];
 
     const novoHistorico = [
       ...historicoAtual,
+
       {
         usuario:
           usuario.displayName,
-        valor: hq.lance + 10,
+
+        email: usuario.email,
+
+        valor:
+          hq.lance + 10,
+
         horario:
           new Date().toLocaleTimeString(),
+
+        timestamp:
+          Date.now(),
       },
     ];
 
     await updateDoc(ref, {
       lance: hq.lance + 10,
+
       tempo: 60,
+
       ultimoLance:
         usuario.displayName,
-      historico: novoHistorico,
+
+      ultimoEmail:
+        usuario.email,
+
+      historico:
+        novoHistorico,
+
+      atualizadoEm:
+        serverTimestamp(),
     });
   };
 
   // ⏱️ cronômetro
   useEffect(() => {
-    const timer = setInterval(() => {
-      hqs.forEach(async (hq) => {
-        const ref = doc(
-          db,
-          "hqs",
-          hq.id
+    const timer =
+      setInterval(() => {
+        hqs.forEach(
+          async (hq) => {
+            const ref = doc(
+              db,
+              "hqs",
+              hq.id
+            );
+
+            // diminuir tempo
+            if (hq.tempo > 0) {
+              await updateDoc(
+                ref,
+                {
+                  tempo:
+                    hq.tempo -
+                    1,
+                }
+              );
+            }
+
+            // 👑 vencedor
+            if (
+              hq.tempo === 1 &&
+              hq.ultimoLance &&
+              !hq.vencedor
+            ) {
+              await updateDoc(
+                ref,
+                {
+                  vencedor:
+                    hq.ultimoLance,
+
+                  vencedorEmail:
+                    hq.ultimoEmail,
+                }
+              );
+            }
+          }
         );
+      }, 1000);
 
-        // ⏱️ diminuir tempo
-        if (hq.tempo > 0) {
-          await updateDoc(ref, {
-            tempo: hq.tempo - 1,
-          });
-        }
-
-        // 👑 definir vencedor
-        if (
-          hq.tempo === 1 &&
-          hq.ultimoLance &&
-          !hq.vencedor
-        ) {
-          await updateDoc(ref, {
-            vencedor:
-              hq.ultimoLance,
-          });
-        }
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
+    return () =>
+      clearInterval(timer);
   }, [hqs]);
 
   // 📝 cadastro
-  const cadastrar = async () => {
-    try {
-      const userCredential =
-        await createUserWithEmailAndPassword(
-          auth,
-          email,
-          senha
+  const cadastrar =
+    async () => {
+      try {
+        const userCredential =
+          await createUserWithEmailAndPassword(
+            auth,
+            email,
+            senha
+          );
+
+        await updateProfile(
+          userCredential.user,
+          {
+            displayName:
+              nome,
+          }
         );
 
-      await updateProfile(
-        userCredential.user,
-        {
-          displayName: nome,
-        }
-      );
+        await auth.currentUser.reload();
 
-      await auth.currentUser.reload();
+        setUsuario(
+          auth.currentUser
+        );
 
-      setUsuario(auth.currentUser);
-
-      alert(
-        "Conta criada com sucesso!"
-      );
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+        alert(
+          "Conta criada com sucesso!"
+        );
+      } catch (error) {
+        alert(error.message);
+      }
+    };
 
   // 🔑 login
   const login = async () => {
@@ -208,7 +292,9 @@ export default function App() {
         senha
       );
 
-      alert("Login realizado!");
+      alert(
+        "Login realizado!"
+      );
     } catch (error) {
       alert(
         "E-mail ou senha inválidos."
@@ -226,7 +312,8 @@ export default function App() {
       <h1>🦸‍♂️ Gibilance</h1>
 
       <p className="subtitulo">
-        Plataforma de leilão de HQs
+        Plataforma de leilão
+        de HQs
       </p>
 
       {/* 🔐 LOGIN */}
@@ -243,7 +330,35 @@ export default function App() {
               }
             </h3>
 
-            <button onClick={logout}>
+            <small>
+              {usuario.email}
+            </small>
+
+            {/* 👑 ADMIN */}
+            {usuario &&
+              usuario.email &&
+              usuario.email
+                .trim()
+                .toLowerCase() ===
+                adminEmail.toLowerCase() && (
+                <p
+                  style={{
+                    color:
+                      "#facc15",
+
+                    fontWeight:
+                      "bold",
+
+                    marginTop: 10,
+                  }}
+                >
+                  👑 ADMIN
+                </p>
+              )}
+
+            <button
+              onClick={logout}
+            >
               Sair
             </button>
           </>
@@ -251,57 +366,84 @@ export default function App() {
           <>
             <input
               type="text"
-              placeholder="Seu primeiro nome"
+              placeholder="Primeiro nome"
               value={nome}
               onChange={(e) =>
-                setNome(e.target.value)
+                setNome(
+                  e.target
+                    .value
+                )
               }
             />
 
             <input
               type="email"
-              placeholder="Seu e-mail"
+              placeholder="E-mail"
               value={email}
               onChange={(e) =>
-                setEmail(e.target.value)
+                setEmail(
+                  e.target
+                    .value
+                )
               }
             />
 
             <input
               type="password"
-              placeholder="Sua senha"
+              placeholder="Senha"
               value={senha}
               onChange={(e) =>
-                setSenha(e.target.value)
+                setSenha(
+                  e.target
+                    .value
+                )
               }
             />
 
             <div className="botoes-auth">
-              <button onClick={login}>
+              <button
+                onClick={login}
+              >
                 Entrar
               </button>
 
-              <button onClick={cadastrar}>
-                Cadastrar
+              <button
+                onClick={
+                  cadastrar
+                }
+              >
+                Criar conta
               </button>
             </div>
           </>
         )}
       </div>
 
-      {/* 🚀 botão criar HQs */}
-      <div
-        style={{
-          textAlign: "center",
-          marginBottom: 30,
-        }}
-      >
-        <button
-          onClick={criarHqs}
-        >
-          Criar HQs no Firebase
-        </button>
-      </div>
+      {/* 👑 BOTÃO ADMIN */}
+      {usuario &&
+        usuario.email &&
+        usuario.email
+          .trim()
+          .toLowerCase() ===
+          adminEmail.toLowerCase() && (
+          <div
+            style={{
+              textAlign:
+                "center",
+
+              marginBottom:
+                30,
+            }}
+          >
+            <button
+              onClick={
+                criarHqs
+              }
+            >
+              👑 Criar HQs
+            </button>
+          </div>
+        )}
 
       {/* 🦸 HQs */}
       <div className="lista">
@@ -320,7 +462,8 @@ export default function App() {
 
             <p
               className={`tempo ${
-                hq.tempo <= 10
+                hq.tempo <=
+                10
                   ? "urgente"
                   : ""
               }`}
@@ -331,10 +474,13 @@ export default function App() {
                 : "Leilão encerrado"}
             </p>
 
+            {/* 🔥 último lance */}
             {hq.ultimoLance && (
               <p>
-                🔥 Último lance:
+                🔥 Último
+                lance:
                 <br />
+
                 <strong>
                   {
                     hq.ultimoLance
@@ -345,9 +491,7 @@ export default function App() {
 
             {/* 👑 vencedor */}
             {hq.vencedor && (
-              <div
-                className="vencedor"
-              >
+              <div className="vencedor">
                 👑 Vencedor:
                 <br />
 
@@ -360,12 +504,21 @@ export default function App() {
                 <br />
 
                 💰 R$ {hq.lance}
+
+                <br />
+
+                <small>
+                  {
+                    hq.vencedorEmail
+                  }
+                </small>
               </div>
             )}
 
             {/* 🧾 histórico */}
             {hq.historico &&
-              hq.historico.length >
+              hq.historico
+                .length >
                 0 && (
                 <div className="historico">
                   <h4>
@@ -391,7 +544,11 @@ export default function App() {
                               lance.usuario
                             }
                           </strong>
-                          : R${" "}
+
+                          <br />
+
+                          💰
+                          R${" "}
                           {
                             lance.valor
                           }
@@ -411,7 +568,9 @@ export default function App() {
 
             <button
               onClick={() =>
-                darLance(hq)
+                darLance(
+                  hq
+                )
               }
               disabled={
                 hq.tempo === 0
