@@ -23,7 +23,23 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
+// 🖼️ imagens
+
+import spiderman from "./assets/spiderman.jpg";
+import spiderman2 from "./assets/spiderman2.jpg";
+import spiderman3 from "./assets/spiderman3.jpg";
+
+import batman from "./assets/batman.jpg";
+import batman2 from "./assets/batman2.jpg";
+import batman3 from "./assets/batman3.jpg";
+
+import xmen from "./assets/xmen.jpg";
+import xmen2 from "./assets/xmen2.jpg";
+import xmen3 from "./assets/xmen3.jpg";
+
 export default function App() {
+
+  // 👤 usuário
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -31,12 +47,17 @@ export default function App() {
 
   const [usuario, setUsuario] = useState(null);
 
+  // 👑 admin
+
   const adminEmail =
     "latveriagibis@gmail.com";
 
+  // 🦸 HQs
+
   const [hqs, setHqs] = useState([]);
 
-  // 🔐 login monitor
+  // 🔐 monitor login
+
   useEffect(() => {
 
     const unsubscribe =
@@ -52,6 +73,7 @@ export default function App() {
   }, []);
 
   // 🔥 realtime firestore
+
   useEffect(() => {
 
     const unsubscribe =
@@ -77,6 +99,7 @@ export default function App() {
   }, []);
 
   // 👑 criar HQs
+
   const criarHqs = async () => {
 
     if (
@@ -97,36 +120,123 @@ export default function App() {
 
     const dados = [
 
+      // 🕷️ Homem-Aranha
+
       {
         id: "1",
+
         nome:
           "Homem-Aranha #1",
+
+        imagem:
+          spiderman,
+
+        imagens: [
+          spiderman,
+          spiderman2,
+          spiderman3,
+        ],
+
+        descricao:
+          "HQ clássica do Homem-Aranha em excelente estado. Edição muito procurada por colecionadores.",
+
+        editora:
+          "Abril",
+
+        ano:
+          "1994",
+
+        estado:
+          "Muito bom",
+
         lance: 50,
+
         tempo: 60,
+
         historico: [],
+
         vencedor: "",
+
         vencedorEmail: "",
       },
+
+      // 🦇 Batman
 
       {
         id: "2",
+
         nome:
           "Batman: Ano Um",
+
+        imagem:
+          batman,
+
+        imagens: [
+          batman,
+          batman2,
+          batman3,
+        ],
+
+        descricao:
+          "Clássico absoluto do Batman escrito por Frank Miller.",
+
+        editora:
+          "DC",
+
+        ano:
+          "1987",
+
+        estado:
+          "Excelente",
+
         lance: 80,
+
         tempo: 60,
+
         historico: [],
+
         vencedor: "",
+
         vencedorEmail: "",
       },
 
+      // ❌ X-Men
+
       {
         id: "3",
+
         nome:
           "X-Men Clássico",
+
+        imagem:
+          xmen,
+
+        imagens: [
+          xmen,
+          xmen2,
+          xmen3,
+        ],
+
+        descricao:
+          "Edição clássica dos mutantes mais famosos da Marvel.",
+
+        editora:
+          "Abril",
+
+        ano:
+          "1996",
+
+        estado:
+          "Bom",
+
         lance: 60,
+
         tempo: 60,
+
         historico: [],
+
         vencedor: "",
+
         vencedorEmail: "",
       },
     ];
@@ -145,6 +255,7 @@ export default function App() {
   };
 
   // 💰 lance
+
   const darLance = async (
     hq
   ) => {
@@ -198,7 +309,12 @@ export default function App() {
       lance:
         hq.lance + 10,
 
-      tempo: 60,
+      // ⏰ anti-sniper
+
+      tempo:
+        hq.tempo <= 10
+          ? 15
+          : hq.tempo,
 
       ultimoLance:
         usuario.displayName,
@@ -215,6 +331,7 @@ export default function App() {
   };
 
   // ⏱️ cronômetro
+
   useEffect(() => {
 
     const timer =
@@ -229,6 +346,8 @@ export default function App() {
               hq.id
             );
 
+            // diminuir tempo
+
             if (hq.tempo > 0) {
 
               await updateDoc(
@@ -239,6 +358,8 @@ export default function App() {
                 }
               );
             }
+
+            // 👑 vencedor
 
             if (
               hq.tempo === 1 &&
@@ -267,6 +388,7 @@ export default function App() {
   }, [hqs]);
 
   // 📝 cadastro
+
   const cadastrar =
     async () => {
 
@@ -304,6 +426,7 @@ export default function App() {
     };
 
   // 🔑 login
+
   const login = async () => {
 
     try {
@@ -327,11 +450,13 @@ export default function App() {
   };
 
   // 🚪 logout
+
   const logout = async () => {
     await signOut(auth);
   };
 
   // 📤 exportar resultado
+
   const exportarResultado =
     () => {
 
@@ -345,19 +470,19 @@ export default function App() {
         texto +=
 `📚 ${hq.nome}
 
-👑 Vencedor:
-${hq.vencedor || "Sem vencedor"}
+👑 ${hq.vencedor || "Sem vencedor"}
 
 📧 ${hq.vencedorEmail || "-"}
 
 💰 R$ ${hq.lance}
 
-🧾 Total de lances:
-${hq.historico
-  ? hq.historico.length
-  : 0}
+🧾 ${
+  hq.historico
+    ? hq.historico.length
+    : 0
+} lances
 
-----------------------
+-------------------
 
 `;
       });
@@ -405,6 +530,8 @@ ${hq.historico
             <small>
               {usuario.email}
             </small>
+
+            {/* 👑 admin */}
 
             {usuario.email
               .trim()
@@ -601,9 +728,63 @@ ${hq.historico
             className="card"
           >
 
+            {/* 🖼️ imagem principal */}
+
+            <img
+              src={hq.imagem}
+              alt={hq.nome}
+              className="hq-img"
+            />
+
+            {/* 🖼️ mini galeria */}
+
+            <div className="mini-galeria">
+
+              {hq.imagens?.map(
+                (img, index) => (
+
+                  <img
+                    key={index}
+                    src={img}
+                    alt="HQ"
+                    className="mini-img"
+                  />
+                )
+              )}
+
+            </div>
+
             <h2>
               {hq.nome}
             </h2>
+
+            {/* 📚 descrição */}
+
+            <div className="descricao">
+
+              <p>
+                📚 {hq.descricao}
+              </p>
+
+              <p>
+                🏢 Editora:
+                {" "}
+                {hq.editora}
+              </p>
+
+              <p>
+                📅 Ano:
+                {" "}
+                {hq.ano}
+              </p>
+
+              <p>
+                ⭐ Estado:
+                {" "}
+                {hq.estado}
+              </p>
+
+            </div>
 
             <p className="valor">
               💰 Lance:

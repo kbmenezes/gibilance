@@ -26,6 +26,8 @@ h1 {
   margin-bottom: 30px;
 }
 
+/* 🔐 login */
+
 .auth-box {
   background: #1f2937;
   padding: 20px;
@@ -53,6 +55,8 @@ h1 {
   flex-wrap: wrap;
 }
 
+/* 🔘 botões */
+
 button {
   background: #2563eb;
   color: white;
@@ -74,14 +78,18 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* 🦸 lista HQs */
+
 .lista {
   display: grid;
   grid-template-columns: repeat(
     auto-fit,
-    minmax(280px, 1fr)
+    minmax(320px, 1fr)
   );
   gap: 20px;
 }
+
+/* 📦 card */
 
 .card {
   background: #1f2937;
@@ -100,11 +108,66 @@ button:disabled {
   margin-bottom: 15px;
 }
 
+/* 🖼️ imagem principal */
+
+.hq-img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+/* 🖼️ mini galeria */
+
+.mini-galeria {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.mini-img {
+  width: 70px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #374151;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.mini-img:hover {
+  transform: scale(1.05);
+  border-color: #60a5fa;
+}
+
+/* 📚 descrição */
+
+.descricao {
+  text-align: left;
+  margin-bottom: 20px;
+  background: #111827;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.descricao p {
+  margin: 8px 0;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+
+/* 💰 valor */
+
 .valor {
   font-size: 22px;
   font-weight: bold;
   color: #22c55e;
 }
+
+/* ⏱️ tempo */
 
 .tempo {
   font-size: 20px;
@@ -132,6 +195,8 @@ button:disabled {
   }
 }
 
+/* 👑 vencedor */
+
 .vencedor {
   background: #14532d;
   padding: 12px;
@@ -139,6 +204,8 @@ button:disabled {
   margin-top: 15px;
   margin-bottom: 15px;
 }
+
+/* 🧾 histórico */
 
 .historico {
   background: #111827;
@@ -214,5 +281,9 @@ button:disabled {
 
   .botoes-auth {
     flex-direction: column;
+  }
+
+  .hq-img {
+    height: 260px;
   }
 }
