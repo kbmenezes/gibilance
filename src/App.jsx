@@ -24,22 +24,21 @@ import {
 } from "firebase/firestore";
 
 export default function App() {
-  // 👤 usuário
+
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
   const [usuario, setUsuario] = useState(null);
 
-  // 👑 ADMIN
   const adminEmail =
     "latveriagibis@gmail.com";
 
-  // 🦸 HQs
   const [hqs, setHqs] = useState([]);
 
-  // 🔐 monitorar login
+  // 🔐 login monitor
   useEffect(() => {
+
     const unsubscribe =
       onAuthStateChanged(
         auth,
@@ -49,14 +48,17 @@ export default function App() {
       );
 
     return () => unsubscribe();
+
   }, []);
 
-  // 🔥 carregar HQs
+  // 🔥 realtime firestore
   useEffect(() => {
+
     const unsubscribe =
       onSnapshot(
         collection(db, "hqs"),
         (snapshot) => {
+
           const lista =
             snapshot.docs.map(
               (doc) => ({
@@ -66,15 +68,17 @@ export default function App() {
             );
 
           setHqs(lista);
+
         }
       );
 
     return () => unsubscribe();
+
   }, []);
 
-  // 🚀 criar HQs
+  // 👑 criar HQs
   const criarHqs = async () => {
-    // 🔒 PROTEÇÃO ADMIN
+
     if (
       !usuario ||
       !usuario.email ||
@@ -83,14 +87,16 @@ export default function App() {
         .toLowerCase() !==
         adminEmail.toLowerCase()
     ) {
+
       alert(
-        "Apenas o administrador pode criar HQs."
+        "Apenas admin."
       );
 
       return;
     }
 
     const dados = [
+
       {
         id: "1",
         nome:
@@ -126,6 +132,7 @@ export default function App() {
     ];
 
     for (const hq of dados) {
+
       await setDoc(
         doc(db, "hqs", hq.id),
         hq
@@ -133,7 +140,7 @@ export default function App() {
     }
 
     alert(
-      "HQs criadas com sucesso!"
+      "HQs criadas!"
     );
   };
 
@@ -141,9 +148,11 @@ export default function App() {
   const darLance = async (
     hq
   ) => {
+
     if (!usuario) {
+
       alert(
-        "Faça login para participar."
+        "Faça login."
       );
 
       return;
@@ -163,13 +172,15 @@ export default function App() {
       hq.historico || [];
 
     const novoHistorico = [
+
       ...historicoAtual,
 
       {
         usuario:
           usuario.displayName,
 
-        email: usuario.email,
+        email:
+          usuario.email,
 
         valor:
           hq.lance + 10,
@@ -183,7 +194,9 @@ export default function App() {
     ];
 
     await updateDoc(ref, {
-      lance: hq.lance + 10,
+
+      lance:
+        hq.lance + 10,
 
       tempo: 60,
 
@@ -203,34 +216,36 @@ export default function App() {
 
   // ⏱️ cronômetro
   useEffect(() => {
+
     const timer =
       setInterval(() => {
+
         hqs.forEach(
           async (hq) => {
+
             const ref = doc(
               db,
               "hqs",
               hq.id
             );
 
-            // diminuir tempo
             if (hq.tempo > 0) {
+
               await updateDoc(
                 ref,
                 {
                   tempo:
-                    hq.tempo -
-                    1,
+                    hq.tempo - 1,
                 }
               );
             }
 
-            // 👑 vencedor
             if (
               hq.tempo === 1 &&
               hq.ultimoLance &&
               !hq.vencedor
             ) {
+
               await updateDoc(
                 ref,
                 {
@@ -248,12 +263,15 @@ export default function App() {
 
     return () =>
       clearInterval(timer);
+
   }, [hqs]);
 
   // 📝 cadastro
   const cadastrar =
     async () => {
+
       try {
+
         const userCredential =
           await createUserWithEmailAndPassword(
             auth,
@@ -276,16 +294,20 @@ export default function App() {
         );
 
         alert(
-          "Conta criada com sucesso!"
+          "Conta criada!"
         );
+
       } catch (error) {
+
         alert(error.message);
       }
     };
 
   // 🔑 login
   const login = async () => {
+
     try {
+
       await signInWithEmailAndPassword(
         auth,
         email,
@@ -293,11 +315,13 @@ export default function App() {
       );
 
       alert(
-        "Login realizado!"
+        "Login OK!"
       );
-    } catch (error) {
+
+    } catch {
+
       alert(
-        "E-mail ou senha inválidos."
+        "Erro login."
       );
     }
   };
@@ -307,9 +331,53 @@ export default function App() {
     await signOut(auth);
   };
 
+  // 📤 exportar resultado
+  const exportarResultado =
+    () => {
+
+      let texto =
+`🏆 RESULTADO GIBILANCE
+
+`;
+
+      hqs.forEach((hq) => {
+
+        texto +=
+`📚 ${hq.nome}
+
+👑 Vencedor:
+${hq.vencedor || "Sem vencedor"}
+
+📧 ${hq.vencedorEmail || "-"}
+
+💰 R$ ${hq.lance}
+
+🧾 Total de lances:
+${hq.historico
+  ? hq.historico.length
+  : 0}
+
+----------------------
+
+`;
+      });
+
+      navigator.clipboard.writeText(
+        texto
+      );
+
+      alert(
+        "Resultado copiado!"
+      );
+    };
+
   return (
+
     <div className="container">
-      <h1>🦸‍♂️ Gibilance</h1>
+
+      <h1>
+        🦸‍♂️ Gibilance
+      </h1>
 
       <p className="subtitulo">
         Plataforma de leilão
@@ -317,9 +385,13 @@ export default function App() {
       </p>
 
       {/* 🔐 LOGIN */}
+
       <div className="auth-box">
+
         {usuario ? (
+
           <>
+
             <p>
               👤 Logado como:
             </p>
@@ -334,44 +406,45 @@ export default function App() {
               {usuario.email}
             </small>
 
-            {/* 👑 ADMIN */}
-            {usuario &&
-              usuario.email &&
-              usuario.email
-                .trim()
-                .toLowerCase() ===
-                adminEmail.toLowerCase() && (
-                <p
-                  style={{
-                    color:
-                      "#facc15",
+            {usuario.email
+              .trim()
+              .toLowerCase() ===
+              adminEmail.toLowerCase() && (
 
-                    fontWeight:
-                      "bold",
+              <p
+                style={{
+                  color:
+                    "#facc15",
 
-                    marginTop: 10,
-                  }}
-                >
-                  👑 ADMIN
-                </p>
-              )}
+                  fontWeight:
+                    "bold",
+
+                  marginTop: 10,
+                }}
+              >
+                👑 ADMIN
+              </p>
+            )}
 
             <button
               onClick={logout}
             >
               Sair
             </button>
+
           </>
+
         ) : (
+
           <>
+
             <input
               type="text"
               placeholder="Primeiro nome"
               value={nome}
               onChange={(e) =>
                 setNome(
-                  e.target
-                    .value
+                  e.target.value
                 )
               }
             />
@@ -382,8 +455,7 @@ export default function App() {
               value={email}
               onChange={(e) =>
                 setEmail(
-                  e.target
-                    .value
+                  e.target.value
                 )
               }
             />
@@ -394,13 +466,13 @@ export default function App() {
               value={senha}
               onChange={(e) =>
                 setSenha(
-                  e.target
-                    .value
+                  e.target.value
                 )
               }
             />
 
             <div className="botoes-auth">
+
               <button
                 onClick={login}
               >
@@ -414,27 +486,33 @@ export default function App() {
               >
                 Criar conta
               </button>
+
             </div>
+
           </>
         )}
       </div>
 
-      {/* 👑 BOTÃO ADMIN */}
+      {/* 👑 ADMIN */}
+
       {usuario &&
-        usuario.email &&
-        usuario.email
-          .trim()
-          .toLowerCase() ===
-          adminEmail.toLowerCase() && (
+       usuario.email
+         .trim()
+         .toLowerCase() ===
+       adminEmail.toLowerCase() && (
+
+        <>
+
           <div
             style={{
               textAlign:
                 "center",
 
               marginBottom:
-                30,
+                20,
             }}
           >
+
             <button
               onClick={
                 criarHqs
@@ -442,43 +520,116 @@ export default function App() {
             >
               👑 Criar HQs
             </button>
+
           </div>
-        )}
+
+          {/* 👑 painel */}
+
+          <div className="admin-panel">
+
+            <h2>
+              👑 Painel Administrativo
+            </h2>
+
+            <button
+              className="exportar-btn"
+              onClick={
+                exportarResultado
+              }
+            >
+              📤 Exportar Resultado
+            </button>
+
+            {hqs.map((hq) => (
+
+              <div
+                key={hq.id}
+                className="admin-card"
+              >
+
+                <h3>
+                  {hq.nome}
+                </h3>
+
+                <p>
+                  💰 Valor:
+                  <br />
+
+                  <strong>
+                    R$ {hq.lance}
+                  </strong>
+                </p>
+
+                <p>
+                  👑 Vencedor:
+                  <br />
+
+                  <strong>
+                    {hq.vencedor ||
+                     "Em andamento"}
+                  </strong>
+                </p>
+
+                <p>
+                  📧
+                  {hq.vencedorEmail || "-"}
+                </p>
+
+                <p>
+                  🧾 Lances:
+                  {" "}
+                  {hq.historico
+                    ? hq.historico.length
+                    : 0}
+                </p>
+
+              </div>
+            ))}
+          </div>
+
+        </>
+      )}
 
       {/* 🦸 HQs */}
+
       <div className="lista">
+
         {hqs.map((hq) => (
+
           <div
             key={hq.id}
             className="card"
           >
-            <h2>{hq.nome}</h2>
+
+            <h2>
+              {hq.nome}
+            </h2>
 
             <p className="valor">
-              💰 Lance atual:
+              💰 Lance:
               <br />
+
               R$ {hq.lance}
             </p>
 
             <p
               className={`tempo ${
-                hq.tempo <=
-                10
+                hq.tempo <= 10
                   ? "urgente"
                   : ""
               }`}
             >
               ⏱️{" "}
+
               {hq.tempo > 0
-                ? `${hq.tempo}s restantes`
-                : "Leilão encerrado"}
+                ? `${hq.tempo}s`
+                : "Encerrado"}
             </p>
 
-            {/* 🔥 último lance */}
             {hq.ultimoLance && (
+
               <p>
-                🔥 Último
-                lance:
+                🔥 Último:
                 <br />
 
                 <strong>
@@ -489,9 +640,10 @@ export default function App() {
               </p>
             )}
 
-            {/* 👑 vencedor */}
             {hq.vencedor && (
+
               <div className="vencedor">
+
                 👑 Vencedor:
                 <br />
 
@@ -501,76 +653,12 @@ export default function App() {
                   }
                 </strong>
 
-                <br />
-
-                💰 R$ {hq.lance}
-
-                <br />
-
-                <small>
-                  {
-                    hq.vencedorEmail
-                  }
-                </small>
               </div>
             )}
 
-            {/* 🧾 histórico */}
-            {hq.historico &&
-              hq.historico
-                .length >
-                0 && (
-                <div className="historico">
-                  <h4>
-                    🧾 Histórico
-                  </h4>
-
-                  {hq.historico
-                    .slice()
-                    .reverse()
-                    .map(
-                      (
-                        lance,
-                        index
-                      ) => (
-                        <p
-                          key={
-                            index
-                          }
-                        >
-                          🔥{" "}
-                          <strong>
-                            {
-                              lance.usuario
-                            }
-                          </strong>
-
-                          <br />
-
-                          💰
-                          R${" "}
-                          {
-                            lance.valor
-                          }
-
-                          <br />
-
-                          <small>
-                            {
-                              lance.horario
-                            }
-                          </small>
-                        </p>
-                      )
-                    )}
-                </div>
-              )}
-
             <button
               onClick={() =>
-                darLance(
-                  hq
-                )
+                darLance(hq)
               }
               disabled={
                 hq.tempo === 0
@@ -580,6 +668,7 @@ export default function App() {
                 ? "Dar lance +10"
                 : "Encerrado"}
             </button>
+
           </div>
         ))}
       </div>

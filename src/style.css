@@ -3,157 +3,149 @@
 body {
   margin: 0;
   padding: 0;
-  background: #0f172a;
-  font-family: Arial, Helvetica, sans-serif;
+  background: #111827;
   color: white;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .container {
   max-width: 1200px;
   margin: auto;
-  padding: 30px;
-  text-align: center;
+  padding: 20px;
 }
 
 h1 {
-  font-size: 48px;
+  text-align: center;
+  font-size: 42px;
   margin-bottom: 10px;
-  color: #facc15;
 }
 
 .subtitulo {
-  font-size: 18px;
-  color: #cbd5e1;
+  text-align: center;
+  color: #9ca3af;
   margin-bottom: 30px;
 }
 
-/* 🔐 LOGIN */
-
 .auth-box {
-  background: #1e293b;
-  padding: 25px;
-  border-radius: 15px;
-  max-width: 400px;
-  margin: auto;
-  margin-bottom: 40px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  background: #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .auth-box input {
   width: 100%;
+  max-width: 400px;
   padding: 12px;
-  margin-bottom: 15px;
+  margin: 10px auto;
+  display: block;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 16px;
-  box-sizing: border-box;
 }
 
 .botoes-auth {
   display: flex;
   gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+  flex-wrap: wrap;
 }
 
-.botoes-auth button {
-  flex: 1;
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
 }
 
-/* 🦸 LISTA */
+button:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+button:disabled {
+  background: #4b5563;
+  cursor: not-allowed;
+}
 
 .lista {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(280px, 1fr)
+  );
+  gap: 20px;
 }
 
-/* 🃏 CARD */
-
 .card {
-  background: #1e293b;
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
-  transition: 0.3s;
+  background: #1f2937;
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  transition: 0.2s;
 }
 
 .card:hover {
-  transform: scale(1.03);
+  transform: translateY(-4px);
 }
 
 .card h2 {
-  color: #f8fafc;
   margin-bottom: 15px;
 }
-
-/* 💰 VALOR */
 
 .valor {
   font-size: 22px;
-  color: #4ade80;
   font-weight: bold;
-  margin-bottom: 15px;
+  color: #22c55e;
 }
 
-/* ⏱️ TEMPO */
-
 .tempo {
-  font-size: 18px;
-  margin-bottom: 15px;
-  color: #38bdf8;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 15px 0;
 }
 
 .urgente {
   color: #ef4444;
-  font-weight: bold;
-  animation: piscar 1s infinite;
+  animation: pulse 1s infinite;
 }
 
-@keyframes piscar {
+@keyframes pulse {
+
   0% {
-    opacity: 1;
+    transform: scale(1);
   }
 
   50% {
-    opacity: 0.5;
+    transform: scale(1.05);
   }
 
   100% {
-    opacity: 1;
+    transform: scale(1);
   }
 }
 
-/* 🔘 BOTÕES */
-
-button {
-  background: #facc15;
-  color: #0f172a;
-  border: none;
-  padding: 12px 18px;
+.vencedor {
+  background: #14532d;
+  padding: 12px;
   border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
-
-button:hover {
-  background: #fde047;
-  transform: scale(1.05);
-}
-
-button:disabled {
-  background: #64748b;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* 🧾 HISTÓRICO */
 
 .historico {
-  margin-top: 20px;
-  background: #0f172a;
-  padding: 15px;
-  border-radius: 12px;
+  background: #111827;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   text-align: left;
   max-height: 220px;
   overflow-y: auto;
@@ -165,43 +157,59 @@ button:disabled {
 }
 
 .historico p {
-  background: #1e293b;
-  padding: 10px;
-  border-radius: 10px;
+  border-bottom: 1px solid #374151;
+  padding-bottom: 10px;
   margin-bottom: 10px;
-  line-height: 1.5;
 }
 
-.historico small {
-  color: #94a3b8;
+/* 👑 painel admin */
+
+.admin-panel {
+  margin-bottom: 40px;
 }
 
-/* 👑 VENCEDOR */
+.admin-panel h2 {
+  text-align: center;
+  color: #facc15;
+  margin-bottom: 20px;
+}
 
-.vencedor {
-  margin-top: 15px;
-  padding: 15px;
-  background: #14532d;
+.admin-card {
+  background: #1f2937;
+  border: 2px solid #facc15;
   border-radius: 12px;
-  color: #86efac;
-  font-weight: bold;
-  font-size: 18px;
-  border: 2px solid #22c55e;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
-/* 📱 RESPONSIVO */
+.exportar-btn {
+  width: 100%;
+  margin-bottom: 20px;
+  background: #16a34a;
+}
+
+.exportar-btn:hover {
+  opacity: 0.9;
+}
+
+/* 📱 responsivo */
 
 @media (max-width: 768px) {
-  .container {
-    padding: 15px;
-  }
 
   h1 {
-    font-size: 36px;
+    font-size: 32px;
   }
 
-  .lista {
-    grid-template-columns: 1fr;
+  .valor {
+    font-size: 20px;
+  }
+
+  .tempo {
+    font-size: 18px;
+  }
+
+  button {
+    width: 100%;
   }
 
   .botoes-auth {

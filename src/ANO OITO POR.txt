@@ -1,0 +1,21 @@
+butterfly - 9
+titanic - 10
+pacto - 6
+justiça - 4
+senhora - 10
+cantor - 5
+
+
+MELHOR FILME
+Butterfly 
+Titanic
+Senhora do Destino
+Pacto pela Redenção
+O Jovem Cantor
+
+MELHOR DIREÇÃO
+Marla Skewer (Butterfly) 
+Otto Maverick (Titanic)
+Stella Hupkins (Senhora do Destino)
+Paul Shapper (Pacto pela Redenção)
+Sean Shapper (O Jovem Cantor)
