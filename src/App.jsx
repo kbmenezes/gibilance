@@ -17,25 +17,10 @@ import {
 import {
   collection,
   doc,
-  setDoc,
   onSnapshot,
   updateDoc,
-  serverTimestamp,
+  addDoc,
 } from "firebase/firestore";
-
-// 🖼️ imagens
-
-import spiderman from "./assets/spiderman.jpg";
-import spiderman2 from "./assets/spiderman2.jpg";
-import spiderman3 from "./assets/spiderman3.jpg";
-
-import batman from "./assets/batman.jpg";
-import batman2 from "./assets/batman2.jpg";
-import batman3 from "./assets/batman3.jpg";
-
-import xmen from "./assets/xmen.jpg";
-import xmen2 from "./assets/xmen2.jpg";
-import xmen3 from "./assets/xmen3.jpg";
 
 export default function App() {
 
@@ -52,9 +37,45 @@ export default function App() {
   const adminEmail =
     "latveriagibis@gmail.com";
 
+  // 💬 whatsapp admin
+
+  const whatsapp =
+    "5551999999999";
+
   // 🦸 HQs
 
   const [hqs, setHqs] = useState([]);
+
+  // 🔍 imagem selecionada
+
+  const [
+    imagemSelecionada,
+    setImagemSelecionada,
+  ] = useState({});
+
+  // 👑 formulário admin
+
+  const [novaHQ, setNovaHQ] =
+    useState({
+
+      nome: "",
+
+      descricao: "",
+
+      editora: "",
+
+      ano: "",
+
+      estado: "",
+
+      imagem: "",
+
+      imagensExtras: "",
+
+      lance: "",
+
+      encerramento: "",
+    });
 
   // 🔐 monitor login
 
@@ -98,161 +119,115 @@ export default function App() {
 
   }, []);
 
-  // 👑 criar HQs
+  // 👑 cadastrar HQ REAL
 
-  const criarHqs = async () => {
+  const cadastrarHQ =
+    async () => {
 
-    if (
-      !usuario ||
-      !usuario.email ||
-      usuario.email
-        .trim()
-        .toLowerCase() !==
+      if (
+        !usuario ||
+        usuario.email
+          .trim()
+          .toLowerCase() !==
         adminEmail.toLowerCase()
-    ) {
+      ) {
+
+        alert(
+          "Apenas admin."
+        );
+
+        return;
+      }
+
+      if (
+        !novaHQ.nome ||
+        !novaHQ.imagem
+      ) {
+
+        alert(
+          "Preencha nome e imagem."
+        );
+
+        return;
+      }
+
+      const imagens =
+        novaHQ.imagensExtras
+          ? novaHQ.imagensExtras
+              .split(",")
+              .map((img) =>
+                img.trim()
+              )
+          : [];
+
+      await addDoc(
+        collection(db, "hqs"),
+        {
+
+          nome:
+            novaHQ.nome,
+
+          descricao:
+            novaHQ.descricao,
+
+          editora:
+            novaHQ.editora,
+
+          ano:
+            novaHQ.ano,
+
+          estado:
+            novaHQ.estado,
+
+          imagem:
+            novaHQ.imagem,
+
+          imagens: [
+            novaHQ.imagem,
+            ...imagens,
+          ],
+
+          lance:
+            Number(
+              novaHQ.lance
+            ),
+
+          encerramento:
+            novaHQ.encerramento,
+
+          historico: [],
+
+          vencedor: "",
+
+          vencedorEmail: "",
+        }
+      );
 
       alert(
-        "Apenas admin."
+        "HQ cadastrada!"
       );
 
-      return;
-    }
+      setNovaHQ({
 
-    const dados = [
+        nome: "",
 
-      // 🕷️ Homem-Aranha
+        descricao: "",
 
-      {
-        id: "1",
+        editora: "",
 
-        nome:
-          "Homem-Aranha #1",
+        ano: "",
 
-        imagem:
-          spiderman,
+        estado: "",
 
-        imagens: [
-          spiderman,
-          spiderman2,
-          spiderman3,
-        ],
+        imagem: "",
 
-        descricao:
-          "HQ clássica do Homem-Aranha em excelente estado. Edição muito procurada por colecionadores.",
+        imagensExtras: "",
 
-        editora:
-          "Abril",
+        lance: "",
 
-        ano:
-          "1994",
-
-        estado:
-          "Muito bom",
-
-        lance: 50,
-
-        tempo: 60,
-
-        historico: [],
-
-        vencedor: "",
-
-        vencedorEmail: "",
-      },
-
-      // 🦇 Batman
-
-      {
-        id: "2",
-
-        nome:
-          "Batman: Ano Um",
-
-        imagem:
-          batman,
-
-        imagens: [
-          batman,
-          batman2,
-          batman3,
-        ],
-
-        descricao:
-          "Clássico absoluto do Batman escrito por Frank Miller.",
-
-        editora:
-          "DC",
-
-        ano:
-          "1987",
-
-        estado:
-          "Excelente",
-
-        lance: 80,
-
-        tempo: 60,
-
-        historico: [],
-
-        vencedor: "",
-
-        vencedorEmail: "",
-      },
-
-      // ❌ X-Men
-
-      {
-        id: "3",
-
-        nome:
-          "X-Men Clássico",
-
-        imagem:
-          xmen,
-
-        imagens: [
-          xmen,
-          xmen2,
-          xmen3,
-        ],
-
-        descricao:
-          "Edição clássica dos mutantes mais famosos da Marvel.",
-
-        editora:
-          "Abril",
-
-        ano:
-          "1996",
-
-        estado:
-          "Bom",
-
-        lance: 60,
-
-        tempo: 60,
-
-        historico: [],
-
-        vencedor: "",
-
-        vencedorEmail: "",
-      },
-    ];
-
-    for (const hq of dados) {
-
-      await setDoc(
-        doc(db, "hqs", hq.id),
-        hq
-      );
-    }
-
-    alert(
-      "HQs criadas!"
-    );
-  };
+        encerramento: "",
+      });
+    };
 
   // 💰 lance
 
@@ -269,7 +244,20 @@ export default function App() {
       return;
     }
 
-    if (hq.tempo <= 0) {
+    const agora =
+      new Date().getTime();
+
+    const fim =
+      new Date(
+        hq.encerramento
+      ).getTime();
+
+    if (agora > fim) {
+
+      alert(
+        "Leilão encerrado."
+      );
+
       return;
     }
 
@@ -297,10 +285,7 @@ export default function App() {
           hq.lance + 10,
 
         horario:
-          new Date().toLocaleTimeString(),
-
-        timestamp:
-          Date.now(),
+          new Date().toLocaleString(),
       },
     ];
 
@@ -308,13 +293,6 @@ export default function App() {
 
       lance:
         hq.lance + 10,
-
-      // ⏰ anti-sniper
-
-      tempo:
-        hq.tempo <= 10
-          ? 15
-          : hq.tempo,
 
       ultimoLance:
         usuario.displayName,
@@ -324,48 +302,38 @@ export default function App() {
 
       historico:
         novoHistorico,
-
-      atualizadoEm:
-        serverTimestamp(),
     });
   };
 
-  // ⏱️ cronômetro
+  // 👑 definir vencedor automático
 
   useEffect(() => {
 
-    const timer =
+    const verificar =
       setInterval(() => {
 
         hqs.forEach(
           async (hq) => {
 
-            const ref = doc(
-              db,
-              "hqs",
-              hq.id
-            );
+            const agora =
+              new Date().getTime();
 
-            // diminuir tempo
-
-            if (hq.tempo > 0) {
-
-              await updateDoc(
-                ref,
-                {
-                  tempo:
-                    hq.tempo - 1,
-                }
-              );
-            }
-
-            // 👑 vencedor
+            const fim =
+              new Date(
+                hq.encerramento
+              ).getTime();
 
             if (
-              hq.tempo === 1 &&
-              hq.ultimoLance &&
-              !hq.vencedor
+              agora > fim &&
+              !hq.vencedor &&
+              hq.ultimoLance
             ) {
+
+              const ref = doc(
+                db,
+                "hqs",
+                hq.id
+              );
 
               await updateDoc(
                 ref,
@@ -380,10 +348,10 @@ export default function App() {
             }
           }
         );
-      }, 1000);
+      }, 5000);
 
     return () =>
-      clearInterval(timer);
+      clearInterval(verificar);
 
   }, [hqs]);
 
@@ -476,11 +444,8 @@ export default function App() {
 
 💰 R$ ${hq.lance}
 
-🧾 ${
-  hq.historico
-    ? hq.historico.length
-    : 0
-} lances
+📅 Encerramento:
+${hq.encerramento}
 
 -------------------
 
@@ -494,6 +459,52 @@ export default function App() {
       alert(
         "Resultado copiado!"
       );
+    };
+
+  // ⏱️ calcular tempo restante
+
+  const tempoRestante =
+    (dataFim) => {
+
+      const agora =
+        new Date().getTime();
+
+      const fim =
+        new Date(dataFim)
+          .getTime();
+
+      const diferenca =
+        fim - agora;
+
+      if (diferenca <= 0) {
+        return "Encerrado";
+      }
+
+      const dias =
+        Math.floor(
+          diferenca /
+          (1000 * 60 * 60 * 24)
+        );
+
+      const horas =
+        Math.floor(
+          (
+            diferenca %
+            (1000 * 60 * 60 * 24)
+          ) /
+          (1000 * 60 * 60)
+        );
+
+      const minutos =
+        Math.floor(
+          (
+            diferenca %
+            (1000 * 60 * 60)
+          ) /
+          (1000 * 60)
+        );
+
+      return `${dias}d ${horas}h ${minutos}m`;
     };
 
   return (
@@ -530,8 +541,6 @@ export default function App() {
             <small>
               {usuario.email}
             </small>
-
-            {/* 👑 admin */}
 
             {usuario.email
               .trim()
@@ -628,93 +637,175 @@ export default function App() {
          .toLowerCase() ===
        adminEmail.toLowerCase() && (
 
-        <>
+        <div className="admin-panel">
 
-          <div
-            style={{
-              textAlign:
-                "center",
+          <h2>
+            👑 Painel Admin
+          </h2>
 
-              marginBottom:
-                20,
-            }}
+          {/* 📤 exportar */}
+
+          <button
+            className="exportar-btn"
+            onClick={
+              exportarResultado
+            }
           >
+            📤 Exportar Resultado
+          </button>
+
+          {/* ➕ cadastrar HQ */}
+
+          <div className="admin-card">
+
+            <h3>
+              ➕ Nova HQ
+            </h3>
+
+            <input
+              type="text"
+              placeholder="Nome da HQ"
+              value={
+                novaHQ.nome
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  nome:
+                    e.target.value,
+                })
+              }
+            />
+
+            <textarea
+              placeholder="Descrição"
+              value={
+                novaHQ.descricao
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  descricao:
+                    e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Editora"
+              value={
+                novaHQ.editora
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  editora:
+                    e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Ano"
+              value={
+                novaHQ.ano
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  ano:
+                    e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Estado"
+              value={
+                novaHQ.estado
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  estado:
+                    e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="URL imagem principal"
+              value={
+                novaHQ.imagem
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  imagem:
+                    e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="URLs extras separadas por vírgula"
+              value={
+                novaHQ.imagensExtras
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  imagensExtras:
+                    e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="number"
+              placeholder="Lance inicial"
+              value={
+                novaHQ.lance
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  lance:
+                    e.target.value,
+                })
+              }
+            />
+
+            <input
+              type="datetime-local"
+              value={
+                novaHQ.encerramento
+              }
+              onChange={(e) =>
+                setNovaHQ({
+                  ...novaHQ,
+                  encerramento:
+                    e.target.value,
+                })
+              }
+            />
 
             <button
               onClick={
-                criarHqs
+                cadastrarHQ
               }
             >
-              👑 Criar HQs
+              🚀 Publicar HQ
             </button>
 
           </div>
 
-          {/* 👑 painel */}
-
-          <div className="admin-panel">
-
-            <h2>
-              👑 Painel Administrativo
-            </h2>
-
-            <button
-              className="exportar-btn"
-              onClick={
-                exportarResultado
-              }
-            >
-              📤 Exportar Resultado
-            </button>
-
-            {hqs.map((hq) => (
-
-              <div
-                key={hq.id}
-                className="admin-card"
-              >
-
-                <h3>
-                  {hq.nome}
-                </h3>
-
-                <p>
-                  💰 Valor:
-                  <br />
-
-                  <strong>
-                    R$ {hq.lance}
-                  </strong>
-                </p>
-
-                <p>
-                  👑 Vencedor:
-                  <br />
-
-                  <strong>
-                    {hq.vencedor ||
-                     "Em andamento"}
-                  </strong>
-                </p>
-
-                <p>
-                  📧
-                  {hq.vencedorEmail || "-"}
-                </p>
-
-                <p>
-                  🧾 Lances:
-                  {" "}
-                  {hq.historico
-                    ? hq.historico.length
-                    : 0}
-                </p>
-
-              </div>
-            ))}
-          </div>
-
-        </>
+        </div>
       )}
 
       {/* 🦸 HQs */}
@@ -731,12 +822,15 @@ export default function App() {
             {/* 🖼️ imagem principal */}
 
             <img
-              src={hq.imagem}
+              src={
+                imagemSelecionada[hq.id]
+                  || hq.imagem
+              }
               alt={hq.nome}
               className="hq-img"
             />
 
-            {/* 🖼️ mini galeria */}
+            {/* 🖼️ galeria */}
 
             <div className="mini-galeria">
 
@@ -748,6 +842,16 @@ export default function App() {
                     src={img}
                     alt="HQ"
                     className="mini-img"
+
+                    onClick={() =>
+
+                      setImagemSelecionada({
+
+                        ...imagemSelecionada,
+
+                        [hq.id]: img,
+                      })
+                    }
                   />
                 )
               )}
@@ -787,30 +891,31 @@ export default function App() {
             </div>
 
             <p className="valor">
-              💰 Lance:
+              💰 Lance Atual
               <br />
 
               R$ {hq.lance}
             </p>
 
-            <p
-              className={`tempo ${
-                hq.tempo <= 10
-                  ? "urgente"
-                  : ""
-              }`}
-            >
-              ⏱️{" "}
+            <p className="tempo">
 
-              {hq.tempo > 0
-                ? `${hq.tempo}s`
-                : "Encerrado"}
+              ⏳
+
+              {" "}
+
+              {
+                tempoRestante(
+                  hq.encerramento
+                )
+              }
+
             </p>
 
             {hq.ultimoLance && (
 
               <p>
-                🔥 Último:
+
+                🔥 Último lance:
                 <br />
 
                 <strong>
@@ -818,6 +923,7 @@ export default function App() {
                     hq.ultimoLance
                   }
                 </strong>
+
               </p>
             )}
 
@@ -837,17 +943,37 @@ export default function App() {
               </div>
             )}
 
+            {/* 💬 whatsapp */}
+
+            {hq.vencedor && (
+
+              <a
+                href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(
+
+`Olá! Ganhei a HQ ${hq.nome} no Gibilance.`
+
+                )}`}
+
+                target="_blank"
+
+                rel="noreferrer"
+              >
+
+                <button
+                  className="whats-btn"
+                >
+                  💬 Falar no WhatsApp
+                </button>
+
+              </a>
+            )}
+
             <button
               onClick={() =>
                 darLance(hq)
               }
-              disabled={
-                hq.tempo === 0
-              }
             >
-              {hq.tempo > 0
-                ? "Dar lance +10"
-                : "Encerrado"}
+              💰 Dar lance +10
             </button>
 
           </div>
@@ -856,3 +982,7 @@ export default function App() {
     </div>
   );
 }
+
+
+
+

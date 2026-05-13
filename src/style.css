@@ -8,11 +8,17 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: auto;
   padding: 20px;
 }
+
+/* 🦸 título */
 
 h1 {
   text-align: center;
@@ -23,36 +29,44 @@ h1 {
 .subtitulo {
   text-align: center;
   color: #9ca3af;
-  margin-bottom: 30px;
+  margin-bottom: 35px;
+  font-size: 18px;
 }
 
 /* 🔐 login */
 
 .auth-box {
   background: #1f2937;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
+  padding: 25px;
+  border-radius: 14px;
+  margin-bottom: 35px;
   text-align: center;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
 .auth-box input {
   width: 100%;
-  max-width: 400px;
-  padding: 12px;
+  max-width: 450px;
+  padding: 14px;
   margin: 10px auto;
   display: block;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 16px;
+  background: #374151;
+  color: white;
+}
+
+.auth-box input::placeholder {
+  color: #d1d5db;
 }
 
 .botoes-auth {
   display: flex;
   gap: 10px;
   justify-content: center;
-  margin-top: 15px;
   flex-wrap: wrap;
+  margin-top: 15px;
 }
 
 /* 🔘 botões */
@@ -61,21 +75,79 @@ button {
   background: #2563eb;
   color: white;
   border: none;
-  padding: 12px 20px;
+  padding: 13px 20px;
   border-radius: 10px;
   cursor: pointer;
   font-size: 16px;
   transition: 0.2s;
+  font-weight: bold;
 }
 
 button:hover {
   transform: scale(1.03);
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 button:disabled {
   background: #4b5563;
   cursor: not-allowed;
+}
+
+/* 👑 admin */
+
+.admin-panel {
+  margin-bottom: 40px;
+}
+
+.admin-panel h2 {
+  text-align: center;
+  color: #facc15;
+  margin-bottom: 25px;
+}
+
+.admin-card {
+  background: #1f2937;
+  padding: 25px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+  border: 2px solid #facc15;
+}
+
+.admin-card h3 {
+  margin-top: 0;
+  color: #facc15;
+}
+
+.admin-card input,
+.admin-card textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #374151;
+  color: white;
+  font-size: 15px;
+}
+
+.admin-card textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.admin-card input::placeholder,
+.admin-card textarea::placeholder {
+  color: #d1d5db;
+}
+
+.exportar-btn {
+  width: 100%;
+  background: #16a34a;
+  margin-bottom: 25px;
+}
+
+.exportar-btn:hover {
+  opacity: 0.9;
 }
 
 /* 🦸 lista HQs */
@@ -84,19 +156,19 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(
     auto-fit,
-    minmax(320px, 1fr)
+    minmax(340px, 1fr)
   );
-  gap: 20px;
+  gap: 24px;
 }
 
-/* 📦 card */
+/* 📦 cards */
 
 .card {
   background: #1f2937;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  box-shadow: 0 0 15px rgba(0,0,0,0.35);
   transition: 0.2s;
 }
 
@@ -105,6 +177,7 @@ button:disabled {
 }
 
 .card h2 {
+  margin-top: 15px;
   margin-bottom: 15px;
 }
 
@@ -112,10 +185,11 @@ button:disabled {
 
 .hq-img {
   width: 100%;
-  height: 320px;
+  height: 420px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 14px;
   margin-bottom: 15px;
+  background: #111827;
 }
 
 /* 🖼️ mini galeria */
@@ -123,19 +197,20 @@ button:disabled {
 .mini-galeria {
   display: flex;
   gap: 10px;
-  margin-bottom: 15px;
   overflow-x: auto;
+  margin-bottom: 15px;
   padding-bottom: 5px;
 }
 
 .mini-img {
-  width: 70px;
-  height: 90px;
+  width: 75px;
+  height: 95px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 2px solid #374151;
-  transition: 0.2s;
   cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
 }
 
 .mini-img:hover {
@@ -146,116 +221,58 @@ button:disabled {
 /* 📚 descrição */
 
 .descricao {
+  background: #111827;
+  border-radius: 12px;
+  padding: 14px;
   text-align: left;
   margin-bottom: 20px;
-  background: #111827;
-  padding: 12px;
-  border-radius: 10px;
 }
 
 .descricao p {
-  margin: 8px 0;
+  margin: 10px 0;
   color: #d1d5db;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* 💰 valor */
 
 .valor {
-  font-size: 22px;
-  font-weight: bold;
+  font-size: 24px;
   color: #22c55e;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
 
-/* ⏱️ tempo */
+/* ⏳ tempo */
 
 .tempo {
   font-size: 20px;
   font-weight: bold;
-  margin: 15px 0;
-}
-
-.urgente {
-  color: #ef4444;
-  animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-
-  100% {
-    transform: scale(1);
-  }
+  color: #facc15;
+  margin-bottom: 15px;
 }
 
 /* 👑 vencedor */
 
 .vencedor {
   background: #14532d;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-
-/* 🧾 histórico */
-
-.historico {
-  background: #111827;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  text-align: left;
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-.historico h4 {
-  margin-top: 0;
-  color: #facc15;
-}
-
-.historico p {
-  border-bottom: 1px solid #374151;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-}
-
-/* 👑 painel admin */
-
-.admin-panel {
-  margin-bottom: 40px;
-}
-
-.admin-panel h2 {
-  text-align: center;
-  color: #facc15;
-  margin-bottom: 20px;
-}
-
-.admin-card {
-  background: #1f2937;
-  border: 2px solid #facc15;
+  padding: 14px;
   border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  font-size: 18px;
 }
 
-.exportar-btn {
+/* 💬 whatsapp */
+
+.whats-btn {
+  background: #22c55e;
   width: 100%;
-  margin-bottom: 20px;
-  background: #16a34a;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
-.exportar-btn:hover {
+.whats-btn:hover {
   opacity: 0.9;
 }
 
@@ -263,16 +280,20 @@ button:disabled {
 
 @media (max-width: 768px) {
 
+  .container {
+    padding: 15px;
+  }
+
   h1 {
-    font-size: 32px;
+    font-size: 34px;
   }
 
-  .valor {
-    font-size: 20px;
+  .subtitulo {
+    font-size: 16px;
   }
 
-  .tempo {
-    font-size: 18px;
+  .hq-img {
+    height: 320px;
   }
 
   button {
@@ -283,7 +304,11 @@ button:disabled {
     flex-direction: column;
   }
 
-  .hq-img {
-    height: 260px;
+  .valor {
+    font-size: 21px;
+  }
+
+  .tempo {
+    font-size: 18px;
   }
 }
