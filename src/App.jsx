@@ -466,6 +466,12 @@ ${hq.encerramento}
   const tempoRestante =
     (dataFim) => {
 
+      // 🚨 sem data
+
+      if (!dataFim) {
+        return "Sem data";
+      }
+
       const agora =
         new Date().getTime();
 
@@ -473,8 +479,16 @@ ${hq.encerramento}
         new Date(dataFim)
           .getTime();
 
+      // 🚨 data inválida
+
+      if (isNaN(fim)) {
+        return "Data inválida";
+      }
+
       const diferenca =
         fim - agora;
+
+      // 🚨 encerrado
 
       if (diferenca <= 0) {
         return "Encerrado";
@@ -973,7 +987,7 @@ ${hq.encerramento}
                 darLance(hq)
               }
             >
-              💰 Dar lance +10
+              💰 Dar lance +2
             </button>
 
           </div>
@@ -982,7 +996,3 @@ ${hq.encerramento}
     </div>
   );
 }
-
-
-
-
